@@ -9,3 +9,4 @@ A repo for doing small experiments for self learning purposes.
 * Make a full page application based of off Pinterest inspiration, or design your own.
 * Making something with Three.js
 * Resource for Esperanto reading, speakers, listening, etc
+* Chrome Extension - BetterTTV for YouTube chat
