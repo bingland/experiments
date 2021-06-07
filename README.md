@@ -11,3 +11,4 @@ A repo for doing small experiments for self learning purposes.
 * Resource for Esperanto reading, speakers, listening, etc
 * Chrome Extension - BetterTTV for YouTube chat
 * Some kind of Socket IO app - game for Twitch using emotes? 
+* Login system - backend like Node.js with DB like MySQL or Postgres. Authentication with Passport.js potentially.
