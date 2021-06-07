@@ -10,3 +10,4 @@ A repo for doing small experiments for self learning purposes.
 * Making something with Three.js
 * Resource for Esperanto reading, speakers, listening, etc
 * Chrome Extension - BetterTTV for YouTube chat
+* Some kind of Socket IO app - game for Twitch using emotes? 
