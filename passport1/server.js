@@ -19,11 +19,15 @@ app.use(passport.session())
 
 // pastport init
 const initPassport = require('./passport-config')
-initPassport(
-  passport, 
-  email => users.find(user => user.email === email),
-  id => users.find(user => user.id === id)
-)
+initPassport(passport, getUserByEmail, getUserById)
+
+function getUserByEmail (email) {
+  return users.find(user => user.email === email)
+}
+
+function getUserById (id) {
+  return users.find(user => user.id === id)
+}
 
 // data
 const users = []
@@ -31,9 +35,10 @@ const users = []
 app.get('/', (req, res) => {
   console.log('get /')
   res.send('Welcome to the main page!')
+  console.log(req.user)
 })
 
-app.get('/user', (req, res) => {
+app.get('/user', mustBeAuth, (req, res) => {
   console.log('inside /user')
   console.log(req.user)
   if (!req.user) {
@@ -45,23 +50,28 @@ app.get('/user', (req, res) => {
 })
 
 // login
-app.get('/login', (req, res) => {
+app.get('/login', mustNotBeAuth, (req, res) => {
   console.log('/get login')
   const errMessage = req.flash('error')[0]
   console.log(errMessage)
   res.json({'message':`${errMessage}`})
 })
 
-app.post('/login', passport.authenticate('local', {
+app.post('/login', mustNotBeAuth, passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/login',
   failureFlash: true
 }))
 
 // register
-app.post('/register', async (req, res) => {
+app.post('/register', mustNotBeAuth, async (req, res, next) => {
   console.log(req.body.password)
   console.log('post /register')
+
+  if (getUserByEmail(req.body.email)) {
+    res.json({'message': 'User already exists!'})
+    return next()
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -81,24 +91,28 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
-  req.logOut()
-  req.redirect('login')
+  if (req.user) {
+    req.logOut()
+  }
+  res.redirect('login')
 })
 
-// function checkAuthenticated (req, res, next) {
-//   if (req.isAuthenticated()) {
-//     return next()
-//   }
+function mustBeAuth (req, res, next) {
+  if (req.isAuthenticated()) {
+    return next()
+  }
 
-//   res.redirect('/login')
-// }
+  res.redirect('/login')
+}
 
-// function checkNotAuthenticated (req, res, next) {
-//   if (req.isAuthenticated()) {
-//     res.redirect('/')
-//   }
+function mustNotBeAuth (req, res, next) {
+  console.log(req.isAuthenticated())
+  if (req.isAuthenticated()) {
+    res.redirect('/')
+  } else {
+    return next()
+  }
 
-//   return next()
-// }
+}
 
 app.listen(port, () => console.log(`Server now running on ${port}`))
